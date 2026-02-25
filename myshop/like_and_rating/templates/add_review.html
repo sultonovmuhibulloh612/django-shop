@@ -1,0 +1,64 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+    {% if is_editing %}Редактирование отзыва{% else %}Добавление отзыва{% endif %} - {{ product.name }}
+{% endblock %}
+
+{% block content %}
+<div class="review-form-container">
+    <h1>
+        {% if is_editing %}
+            Edit reveiw for "{{ product.name }}"
+        {% else %}
+            Add review or edit "{{ product.name }}"
+        {% endif %}
+    </h1>
+    
+    <form method="post" class="review-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.rating.id_for_label }}">{{ form.rating.label }}</label>
+            {{ form.rating }}
+            {% if form.rating.errors %}
+                <div class="text-danger">{{ form.rating.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+            {{ form.comment }}
+            {% if form.comment.help_text %}
+                <small class="form-text text-muted">{{ form.comment.help_text }}</small>
+            {% endif %}
+            {% if form.comment.errors %}
+                <div class="text-danger">{{ form.comment.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {% if is_editing %}Обновить отзыв{% else %}Отправить отзыв{% endif %}
+            </button>
+            <a href="{% url 'shop:product_detail' product.id product.slug %}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+    
+    {% if is_editing %}
+        <div class="delete-option">
+            <p>Хотите удалить отзыв?</p>
+            <form method="post" action="{% url 'like_and_rating:delete_review' product.id %}" 
+                  onsubmit="return confirm('Вы уверены, что хотите удалить отзыв?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Удалить отзыв</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

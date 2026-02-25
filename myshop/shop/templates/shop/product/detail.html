@@ -1,0 +1,278 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block title %}
+{{ product.name }}
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="product-detail">
+
+
+    <div class="image-wrapper">
+
+        <img src="{% if product.image %}
+                    {{ product.image.url }}
+                  {% else %}
+                    {% static "img/no_image.png" %}
+                  {% endif %}">
+
+        <div class="rating-circle"
+            id="openRatingModal"
+            data-product-id="{{ product.id }}">
+             {{ product.avg_rating|default:"-" }}
+        </div>
+
+    </div>
+
+    <h1>{{ product.name }}</h1>
+
+    <h2>
+        <a href="{{ product.category.get_absolute_url }}">
+            {{ product.category }}
+        </a>
+    </h2>
+
+    <p class="price">${{ product.price }}</p>
+
+    <form action="{% url "cart:cart_add" product.id %}" method="post">
+        {{ cart_product_form }}
+        {% csrf_token %}
+        <input type="submit" value="Add to cart">
+    </form>
+
+    {{ product.description|linebreaks }}
+    <div class="review-section">
+        {% if user.is_authenticated %}
+            <a href="{% url 'like_and_rating:add_or_edit_review' product.id %}" class="review-link">
+                ✍️ Add review
+            </a>
+        {% else %}
+            <a href="{% url 'account:login' %}?next={% url 'shop:product_detail' product.id product.slug %}" class="review-link">
+                🔑 Login, for  Add review
+            </a>
+        {% endif %}
+    </div>
+
+    {% if recommended_products %}
+        <div class="recommendations">
+            <h3>People who bought this also bought</h3>
+
+            {% for p in recommended_products %}
+                <div class="item">
+                    <a href="{{ p.get_absolute_url }}">
+                        <img src="{% if p.image %}
+                                    {{ p.image.url }}
+                                  {% else %}
+                                    {% static "img/no_image.png" %}
+                                  {% endif %}">
+                    </a>
+
+                    <p>
+                        <a href="{{ p.get_absolute_url }}">{{ p.name }}</a>
+                    </p>
+                </div>
+            {% endfor %}
+
+        </div>
+    {% endif %}
+
+</div>
+
+
+<!-- ================= MODAL ================= -->
+
+<div id="ratingModal" class="modal">
+
+    <div class="modal-content">
+
+        <span class="close">&times;</span>
+
+        <h2>Product reviews</h2>
+
+        <div class="rating-buttons">
+            <button data-rating="5">⭐⭐⭐⭐⭐</button>
+            <button data-rating="4">⭐⭐⭐⭐</button>
+            <button data-rating="3">⭐⭐⭐</button>
+            <button data-rating="2">⭐⭐</button>
+            <button data-rating="1">⭐</button>
+        </div>
+
+        <div id="reviewsContainer">
+            Select rating to see reviews
+        </div>
+
+        <button id="loadMoreBtn" style="display:none;">
+            Load more
+        </button>
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+<!-- ================= JS ================= -->
+
+
+
+{% block domready %}
+
+const modal = document.getElementById("ratingModal");
+const openBtn = document.getElementById("openRatingModal");
+const closeBtn = document.querySelector(".close");
+const reviewsContainer = document.getElementById("reviewsContainer");
+const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+let currentProductId = null;
+let currentRating = "";
+let page = 1;
+
+
+// ===== OPEN MODAL =====
+
+if (openBtn) {
+    openBtn.addEventListener("click", () => {
+        modal.style.display = "block";
+        currentProductId = openBtn.dataset.productId;
+        page = 1;
+        currentRating = "";
+        loadReviews(true);
+    });
+}
+
+
+// ===== CLOSE =====
+
+if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+}
+
+window.addEventListener("click", (e) => {
+    if (e.target === modal) modal.style.display = "none";
+});
+
+
+// ===== СОЗДАНИЕ ОДНОЙ КАРТОЧКИ ОТЗЫВА =====
+
+function createReviewElement(r) {
+
+    // Обёртка
+    const item = document.createElement("div");
+    item.className = "review-item";
+
+    // Имя пользователя
+    const user = document.createElement("strong");
+    user.textContent = r.user;
+
+    // Рейтинг
+    const rating = document.createElement("div");
+    rating.textContent = `⭐ ${r.rating}`;
+
+    // Текст отзыва
+    const text = document.createElement("p");
+    text.textContent = r.text;
+
+    // Дата
+    const date = document.createElement("small");
+    date.textContent = r.date;
+
+    // Разделитель
+    const hr = document.createElement("hr");
+
+    item.appendChild(user);
+    item.appendChild(rating);
+    item.appendChild(text);
+    item.appendChild(date);
+
+    // Возвращаем фрагмент с карточкой и разделителем
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(item);
+    fragment.appendChild(hr);
+
+    return fragment;
+}
+
+
+// ===== LOAD REVIEWS =====
+
+function loadReviews(reset = false) {
+
+    if (!currentProductId) return;
+
+    let url = `/product/${currentProductId}/reviews/?page=${page}`;
+
+    if (currentRating) {
+        url += `&rating=${currentRating}`;
+    }
+
+    if (reset) {
+        reviewsContainer.textContent = "Loading...";
+        loadMoreBtn.style.display = "none";
+    }
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            if (reset) {
+                reviewsContainer.innerHTML = "";
+            }
+
+            if (!data.reviews || (!data.reviews.length && page === 1)) {
+                const noReviews = document.createElement("p");
+                noReviews.textContent = "No reviews";
+                reviewsContainer.appendChild(noReviews);
+                loadMoreBtn.style.display = "none";
+                return;
+            }
+
+            // Собираем все карточки в один фрагмент — один reflow вместо многих
+            const fragment = document.createDocumentFragment();
+
+            data.reviews.forEach(r => {
+                fragment.appendChild(createReviewElement(r));
+            });
+
+            reviewsContainer.appendChild(fragment);
+
+            loadMoreBtn.style.display = data.has_next ? "block" : "none";
+
+        })
+        .catch(error => {
+            console.error("Review load error:", error);
+
+            const errMsg = document.createElement("p");
+            errMsg.textContent = "Failed to load reviews. Please try again.";
+            reviewsContainer.appendChild(errMsg);
+        });
+}
+
+
+// ===== LOAD MORE BUTTON =====
+
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener("click", () => {
+        page++;
+        loadReviews();
+    });
+}
+
+
+// ===== FILTER BY RATING =====
+
+document.querySelectorAll(".rating-buttons button").forEach(btn => {
+    btn.addEventListener("click", function() {
+        currentRating = this.dataset.rating;
+        page = 1;
+        loadReviews(true);
+    });
+});
+
+{% endblock %}

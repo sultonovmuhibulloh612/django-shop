@@ -1,0 +1,36 @@
+{% load static %}
+
+{% for product in products %}
+    <div class="item">
+
+        <!-- Rating -->
+        <div class="rating-circle openRatingModal"
+            data-product-id="{{ product.id }}">
+            {{ product.avg_rating|default:"-" }}
+        </div>
+
+        <!-- Like button -->
+        <button class="like-btn {% if product.user_liked %}liked{% endif %}"
+                data-product-id="{{ product.id }}"
+                data-action="{% if product.user_liked %}unlike{% else %}like{% endif %}">
+            {% if product.user_liked %}❤️{% else %}🤍{% endif %}
+        </button>
+
+        <!-- Image -->
+        <a href="{{ product.get_absolute_url }}" class="product-image">
+            <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}">
+        </a>
+
+        <!-- Name -->
+        <a href="{{ product.get_absolute_url }}" class="product-name">
+            {{ product.name }}
+        </a>
+
+        <!-- Price -->
+        <span class="price">${{ product.price }}</span>
+
+    </div>
+
+{% empty %}
+    <p>Товары не найдены.</p>
+{% endfor %}

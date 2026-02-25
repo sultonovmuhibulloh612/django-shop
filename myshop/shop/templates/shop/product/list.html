@@ -1,0 +1,441 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if category %}{{ category.name }}{% else %}Products{% endif %}
+{% endblock %}
+
+{% block content %}
+    <div id="sidebar">
+        <h3>Categories</h3>
+        <ul>
+            <li {% if not category %}class="selected"{% endif %}>
+                <a href="{% url 'shop:product_list' %}">All</a>
+            </li>
+            {% for c in categories %}
+                <li {% if category.slug == c.slug %}class="selected"{% endif %}>
+                    <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="main" class="product-list">
+        <h1>{% if category %}{{ category.name }}{% else %}Products{% endif %}</h1>
+
+        <!-- Контейнер для товаров -->
+        <div id="product-list-container">
+            {% include "shop/product/list_products.html" %}
+        </div>
+
+        <!-- Индикатор загрузки -->
+        <div id="loading" style="display: none; text-align: center; padding: 20px;">
+            Загрузка...
+        </div>
+    </div>
+<div id="ratingModal" class="modal">
+
+    <div class="modal-content">
+
+        <span class="close">&times;</span>
+
+        <h2>Product reviews</h2>
+
+        <div class="rating-buttons">
+            <button data-rating="5">⭐⭐⭐⭐⭐</button>
+            <button data-rating="4">⭐⭐⭐⭐</button>
+            <button data-rating="3">⭐⭐⭐</button>
+            <button data-rating="2">⭐⭐</button>
+            <button data-rating="1">⭐</button>
+        </div>
+
+        <div id="reviewsContainer">
+            Select rating to see reviews
+        </div>
+
+        <button id="loadMoreBtn" style="display:none;">
+            Load more
+        </button>
+
+    </div>
+
+</div>
+
+   
+{% endblock %}
+
+{% block domready %}
+
+// =====================
+// CSRF
+// =====================
+
+function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+
+// =====================
+// LIKE BUTTONS
+// =====================
+
+function initLikeButtons(container) {
+
+    container.querySelectorAll('.like-btn').forEach(button => {
+
+        button.removeEventListener('click', handleLikeClick);
+        button.addEventListener('click', handleLikeClick);
+
+    });
+
+}
+
+
+function handleLikeClick(e) {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const btn = this;
+    const productId = btn.dataset.productId;
+    const action = btn.dataset.action;
+
+    {% if not request.user.is_authenticated %}
+        const currentPath = window.location.pathname;
+        window.location.href =
+            "{% url 'account:login' %}?next=" +
+            encodeURIComponent(currentPath);
+        return;
+    {% endif %}
+
+    fetch(`/product/${productId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'id': '{{ request.user.id }}',
+            'action': action
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.status === 'ok') {
+
+            if (btn.classList.contains('liked')) {
+
+                btn.classList.remove('liked');
+                btn.dataset.action = 'like';
+                btn.textContent = '🤍';
+
+            } else {
+
+                btn.classList.add('liked');
+                btn.dataset.action = 'unlike';
+                btn.textContent = '❤️';
+
+            }
+
+        }
+
+    })
+    .catch(error => console.error('Error:', error));
+
+}
+
+
+// init existing buttons
+initLikeButtons(document);
+
+
+// =====================
+// INFINITE SCROLL
+// =====================
+
+let page = 1;
+let loading = false;
+let hasNext = true;
+
+const container = document.getElementById('product-list-container');
+const loadingIndicator = document.getElementById('loading');
+
+window.addEventListener('scroll', function() {
+
+    if (!container) return;
+    if (loading || !hasNext) return;
+
+    const scrollTop = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const docHeight = document.documentElement.scrollHeight;
+
+    if (scrollTop + windowHeight >= docHeight - 200) {
+
+        loading = true;
+
+        if (loadingIndicator)
+            loadingIndicator.style.display = 'block';
+
+        page++;
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        url.searchParams.set('products_only', '1');
+
+        fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+
+            if (loadingIndicator)
+                loadingIndicator.style.display = 'none';
+
+            if (!html.trim()) {
+                hasNext = false;
+                return;
+            }
+
+            container.insertAdjacentHTML('beforeend', html);
+
+            initLikeButtons(container);
+
+            loading = false;
+
+        })
+        .catch(error => {
+
+            console.error('Error loading more products:', error);
+
+            loading = false;
+
+            if (loadingIndicator)
+                loadingIndicator.style.display = 'none';
+
+        });
+
+    }
+
+});
+
+
+// =====================
+// RATING MODAL + REVIEWS
+// =====================
+
+const modal = document.getElementById("ratingModal");
+const closeBtn = document.querySelector(".close");
+const reviewsContainer = document.getElementById("reviewsContainer");
+const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+let currentProductId = null;
+let currentRating = "";
+let reviewPage = 1;
+
+
+// ===== OPEN MODAL =====
+
+document.addEventListener("click", function(e) {
+
+    const btn = e.target.closest(".openRatingModal");
+
+    if (!btn) return;
+
+    modal.style.display = "block";
+
+    currentProductId = btn.dataset.productId;
+
+    reviewPage = 1;
+    currentRating = "";
+
+    loadReviews(true);
+
+});
+
+
+// ===== CLOSE =====
+
+if (closeBtn) {
+
+    closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+}
+
+window.addEventListener("click", (e) => {
+
+    if (e.target === modal) {
+        modal.style.display = "none";
+    }
+
+});
+
+
+// =====================
+// СОЗДАНИЕ КАРТОЧКИ ОТЗЫВА
+// =====================
+
+function createReviewElement(r) {
+
+    // Обёртка
+    const item = document.createElement("div");
+    item.className = "review-item";
+
+    // Имя пользователя
+    const user = document.createElement("strong");
+    user.textContent = r.user;
+
+    // Рейтинг
+    const rating = document.createElement("div");
+    rating.textContent = `⭐ ${r.rating}`;
+
+    // Текст отзыва
+    const text = document.createElement("p");
+    text.textContent = r.text;
+
+    // Дата
+    const date = document.createElement("small");
+    date.textContent = r.date;
+
+    item.appendChild(user);
+    item.appendChild(rating);
+    item.appendChild(text);
+    item.appendChild(date);
+
+    // Фрагмент с карточкой и разделителем
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(item);
+    fragment.appendChild(document.createElement("hr"));
+
+    return fragment;
+
+}
+
+
+// =====================
+// LOAD REVIEWS FUNCTION
+// =====================
+
+function loadReviews(reset = false) {
+
+    if (!currentProductId) return;
+
+    let url = `/product/${currentProductId}/reviews/?page=${reviewPage}`;
+
+    if (currentRating) {
+        url += `&rating=${currentRating}`;
+    }
+
+    if (reset) {
+        // ✅ textContent вместо innerHTML — никакой интерпретации HTML
+        reviewsContainer.textContent = "Loading...";
+        if (loadMoreBtn) loadMoreBtn.style.display = "none";
+    }
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            if (reset) {
+                reviewsContainer.textContent = "";
+            }
+
+            if (!data.reviews || (!data.reviews.length && reviewPage === 1)) {
+
+                // ✅ createElement вместо innerHTML
+                const noReviews = document.createElement("p");
+                noReviews.textContent = "No reviews";
+                reviewsContainer.appendChild(noReviews);
+
+                if (loadMoreBtn)
+                    loadMoreBtn.style.display = "none";
+
+                return;
+            }
+
+            // ✅ Собираем все карточки в один фрагмент — один reflow
+            const fragment = document.createDocumentFragment();
+
+            data.reviews.forEach(r => {
+                fragment.appendChild(createReviewElement(r));
+            });
+
+            // ✅ appendChild вместо insertAdjacentHTML
+            reviewsContainer.appendChild(fragment);
+
+            if (loadMoreBtn) {
+                loadMoreBtn.style.display = data.has_next ? "block" : "none";
+            }
+
+        })
+        .catch(error => {
+
+            console.error("Review load error:", error);
+
+            // ✅ Ошибка тоже через textContent
+            const errMsg = document.createElement("p");
+            errMsg.textContent = "Failed to load reviews. Please try again.";
+            reviewsContainer.appendChild(errMsg);
+
+        });
+
+}
+
+
+// =====================
+// LOAD MORE BUTTON
+// =====================
+
+if (loadMoreBtn) {
+
+    loadMoreBtn.addEventListener("click", () => {
+
+        reviewPage++;
+        loadReviews();
+
+    });
+
+}
+
+
+// =====================
+// FILTER BY RATING
+// =====================
+
+document.querySelectorAll(".rating-buttons button").forEach(btn => {
+
+    btn.addEventListener("click", function() {
+
+        currentRating = this.dataset.rating;
+
+        reviewPage = 1;
+
+        loadReviews(true);
+
+    });
+
+});
+
+
+{% endblock %}
