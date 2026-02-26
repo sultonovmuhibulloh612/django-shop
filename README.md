@@ -279,7 +279,6 @@ STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxx
 **1. Клонируйте репозиторий:**
 ```bash
 git clone https://github.com/sultonovmuhibulloh612/django-shop.git
-cd myshop
 ```
 **2. Заполните `.env` своими данными:**(см. раздел "Предварительные требования")
 
@@ -307,7 +306,6 @@ stripe listen --forward-to http://localhost:8000/payment/webhook/
 **1. Клонируйте репозиторий:**
 ```bash
 git clone https://github.com/sultonovmuhibulloh612/django-shop.git
-cd myshop
 ```
 **2. Заполните `.env` своими данными:**(см. раздел "Предварительные требования")
 
