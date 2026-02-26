@@ -77,6 +77,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',        # старая SQLite БД (на случай если понадобится)
     }
 }
+
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
