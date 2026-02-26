@@ -38,7 +38,6 @@ services:
       target: web
     command: gunicorn myshop.wsgi:application --bind 0.0.0.0:8000 --workers 4
     volumes:
-      - .:/app
       - static_volume:/app/myshop/myshop/staticfiles
       - media_volume:/app/myshop/myshop/media
     working_dir: /app/myshop
@@ -63,8 +62,6 @@ services:
       dockerfile: Dockerfile
       target: celery
     command: celery -A myshop worker -l info --concurrency=1
-    volumes:
-      - .:/app
     working_dir: /app/myshop
     env_file: .env
     environment:
