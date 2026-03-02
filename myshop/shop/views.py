@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse
 from django.db.models import Exists, OuterRef, Value, BooleanField, Avg  
 from django.db.models.functions import Coalesce
+from django.db.models.functions import Round
 
 def product_list(request, category_slug=None):
     category = None
@@ -17,7 +18,8 @@ def product_list(request, category_slug=None):
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
     products = products.annotate(
-        avg_rating=Coalesce(Avg('reviews__rating'), Value(0.0)))
+        avg_rating=Round(Coalesce(Avg('reviews__rating'), Value(0.0)), 1)
+    )
 
     # Аннотируем, лайкнул ли текущий пользователь
     if request.user.is_authenticated:
@@ -72,7 +74,7 @@ def product_detail(request, id, slug):
     recommended_products = r.suggest_products_for([product],
                                                  max_results=4)
     product_with_rating = Product.objects.filter(id=product.id).annotate(
-        avg_rating=Coalesce(Avg('reviews__rating'), Value(0.0))
+        avg_rating=Round(Coalesce(Avg('reviews__rating'), Value(0.0)), 1)
     ).first()
     
    

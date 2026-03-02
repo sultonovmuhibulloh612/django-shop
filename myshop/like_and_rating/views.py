@@ -23,7 +23,7 @@ def product_reviews(request, product_id):
     if rating:
         reviews = reviews.filter(rating=rating)
 
-    paginator = Paginator(reviews, 5)
+    paginator = Paginator(reviews, 3)
     page_obj = paginator.get_page(page)
 
     data = []
