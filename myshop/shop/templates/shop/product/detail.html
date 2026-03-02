@@ -48,11 +48,11 @@
     <div class="review-section">
         {% if user.is_authenticated %}
             <a href="{% url 'like_and_rating:add_or_edit_review' product.id %}" class="review-link">
-                ✍️ Add review
+                ✍️ review
             </a>
         {% else %}
             <a href="{% url 'account:login' %}?next={% url 'shop:product_detail' product.id product.slug %}" class="review-link">
-                🔑 Login, for  Add review
+                🔑 Login, for  review
             </a>
         {% endif %}
     </div>
