@@ -27,6 +27,15 @@
   }
 },
 {
+  "model": "like_and_rating.productlike",
+  "pk": 7,
+  "fields": {
+    "user": 2,
+    "product": 2,
+    "created_at": "2026-02-28T12:33:30.305Z"
+  }
+},
+{
   "model": "like_and_rating.productreview",
   "pk": 1,
   "fields": {
@@ -179,6 +188,71 @@
     "comment": "i like  browns",
     "created_at": "2026-02-27T08:16:31.104Z",
     "updated_at": "2026-02-27T08:16:31.104Z",
+    "is_active": true
+  }
+},
+{
+  "model": "like_and_rating.productreview",
+  "pk": 13,
+  "fields": {
+    "user": 2,
+    "product": 1,
+    "rating": 4,
+    "comment": "its bomb",
+    "created_at": "2026-02-28T12:44:41.093Z",
+    "updated_at": "2026-02-28T12:44:41.093Z",
+    "is_active": true
+  }
+},
+{
+  "model": "like_and_rating.productreview",
+  "pk": 14,
+  "fields": {
+    "user": 3,
+    "product": 1,
+    "rating": 3,
+    "comment": "fuck you",
+    "created_at": "2026-02-28T12:55:13.578Z",
+    "updated_at": "2026-02-28T12:55:13.578Z",
+    "is_active": true
+  }
+},
+{
+  "model": "like_and_rating.productreview",
+  "pk": 15,
+  "fields": {
+    "user": 5,
+    "product": 1,
+    "rating": 1,
+    "comment": "Im snob",
+    "created_at": "2026-02-28T12:57:42.124Z",
+    "updated_at": "2026-02-28T12:57:42.124Z",
+    "is_active": true
+  }
+},
+{
+  "model": "like_and_rating.productreview",
+  "pk": 16,
+  "fields": {
+    "user": 6,
+    "product": 1,
+    "rating": 2,
+    "comment": "fdewf",
+    "created_at": "2026-02-28T13:11:41.934Z",
+    "updated_at": "2026-02-28T13:11:41.934Z",
+    "is_active": true
+  }
+},
+{
+  "model": "like_and_rating.productreview",
+  "pk": 17,
+  "fields": {
+    "user": 7,
+    "product": 1,
+    "rating": 2,
+    "comment": "tuj7",
+    "created_at": "2026-02-28T13:13:09.996Z",
+    "updated_at": "2026-02-28T13:14:07.294Z",
     "is_active": true
   }
 },
@@ -1251,6 +1325,14 @@
 },
 {
   "model": "sessions.session",
+  "pk": "fsiayz5et6xjunzj9xyej3oe2xulaztp",
+  "fields": {
+    "session_data": ".eJxVjDEOgzAMRe-SuYpMCK3N2L1nQCZ2GtoKpAQmxN0LEkO7_vf-W03Hy5y6pWjuBjGtqczld-s5vHU8gLx4fE42TOOch94eij1psY9J9HM_3b9A4pL2d4PSsAuRIQDVnhWcR6-OmcBRAwgBPUIlrCSo4q7qK6kxEsEtUtyjgfNs2nXbvhWOOvY:1vx0kH:uJRiXIbDNqeF8uh0l36wNlCqMNos8o68cAhx6-vrj48",
+    "expire_date": "2026-03-16T10:43:25.589Z"
+  }
+},
+{
+  "model": "sessions.session",
   "pk": "o8nz96otoybhxdulhj80c7tmwssw5zia",
   "fields": {
     "session_data": ".eJxVjssOgyAURP-FtSHKwwsuu_cbyIWLxbaRBHFl_Pdq4qLdzjkzmZ053Gpy2xqLm4kNTLHmN_MY3nG5AL1weWYe8lLL7Pml8JuufMwUP4_b_RtIuKazDWbyVlMfAbQWIIUE37bKg8HYd1a0KFBrDyKEDshamlBJYUmeKmg052gudJ-EhgUslQ37cXwBB7c-ag:1vvt1a:28hbnTkcSxLys_4r_Pkoh15TouoMn9TunYzZu2Ssuf0",
@@ -1555,6 +1637,132 @@
     "created": "2026-02-27T08:12:42.461Z",
     "updated": "2026-02-27T08:17:27.990Z",
     "paid": true
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 8,
+  "fields": {
+    "user": 2,
+    "coupon": null,
+    "discount": 0,
+    "first_name": "Patrick",
+    "last_name": "Jane",
+    "email": "sultonovmuhibulloh612@gmail.com",
+    "address": "yourstreet 87",
+    "postal_code": "90210-1234",
+    "city": "Moscow",
+    "created": "2026-02-28T12:37:56.105Z",
+    "updated": "2026-02-28T12:37:56.105Z",
+    "paid": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 9,
+  "fields": {
+    "user": 2,
+    "coupon": null,
+    "discount": 0,
+    "first_name": "Patrick",
+    "last_name": "Jane",
+    "email": "sultonovmuhibulloh612@gmail.com",
+    "address": "yourstreet 87",
+    "postal_code": "90210-1234",
+    "city": "Moscow",
+    "created": "2026-02-28T12:52:51.490Z",
+    "updated": "2026-02-28T12:52:51.490Z",
+    "paid": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 10,
+  "fields": {
+    "user": 3,
+    "coupon": null,
+    "discount": 0,
+    "first_name": "Patrick",
+    "last_name": "Jane",
+    "email": "alpha2@example.com",
+    "address": "yourstreet 87",
+    "postal_code": "90210-1234",
+    "city": "Moscow",
+    "created": "2026-02-28T12:54:22.586Z",
+    "updated": "2026-02-28T12:54:22.586Z",
+    "paid": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 11,
+  "fields": {
+    "user": 4,
+    "coupon": null,
+    "discount": 0,
+    "first_name": "Patrick",
+    "last_name": "Jane",
+    "email": "alpha3@example.com",
+    "address": "yourstreet 87",
+    "postal_code": "90210-1234",
+    "city": "Moscow",
+    "created": "2026-02-28T12:56:06.881Z",
+    "updated": "2026-02-28T12:56:06.881Z",
+    "paid": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 12,
+  "fields": {
+    "user": 5,
+    "coupon": null,
+    "discount": 0,
+    "first_name": "Patrick",
+    "last_name": "Jane",
+    "email": "alpha4@example.com",
+    "address": "yourstreet 87",
+    "postal_code": "90210-1234",
+    "city": "Moscow",
+    "created": "2026-02-28T12:57:06.824Z",
+    "updated": "2026-02-28T12:57:06.824Z",
+    "paid": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 13,
+  "fields": {
+    "user": 6,
+    "coupon": null,
+    "discount": 0,
+    "first_name": "Patrick",
+    "last_name": "Jane",
+    "email": "alpha5@example.com",
+    "address": "yourstreet 87",
+    "postal_code": "90210-1234",
+    "city": "Moscow",
+    "created": "2026-02-28T13:10:01.150Z",
+    "updated": "2026-02-28T13:10:01.150Z",
+    "paid": false
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 14,
+  "fields": {
+    "user": 7,
+    "coupon": null,
+    "discount": 0,
+    "first_name": "Patrick",
+    "last_name": "Jane",
+    "email": "alpha6@example.com",
+    "address": "yourstreet 87",
+    "postal_code": "90210-1234",
+    "city": "Moscow",
+    "created": "2026-02-28T13:12:05.956Z",
+    "updated": "2026-02-28T13:12:05.956Z",
+    "paid": false
   }
 },
 {
@@ -2114,6 +2322,76 @@
     "order": 7,
     "product": 6,
     "price": "250.00",
+    "quantity": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 57,
+  "fields": {
+    "order": 8,
+    "product": 1,
+    "price": "450.00",
+    "quantity": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 58,
+  "fields": {
+    "order": 9,
+    "product": 2,
+    "price": "380.00",
+    "quantity": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 59,
+  "fields": {
+    "order": 10,
+    "product": 1,
+    "price": "450.00",
+    "quantity": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 60,
+  "fields": {
+    "order": 11,
+    "product": 1,
+    "price": "450.00",
+    "quantity": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 61,
+  "fields": {
+    "order": 12,
+    "product": 1,
+    "price": "450.00",
+    "quantity": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 62,
+  "fields": {
+    "order": 13,
+    "product": 1,
+    "price": "450.00",
+    "quantity": 1
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 63,
+  "fields": {
+    "order": 14,
+    "product": 1,
+    "price": "450.00",
     "quantity": 1
   }
 }
