@@ -10,7 +10,4 @@ echo "PostgreSQL started"
 
 python manage.py migrate --noinput
 python manage.py collectstatic --noinput
-python manage.py loaddata myshop_data.json 
-
-
 exec "$@"
